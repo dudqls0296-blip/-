@@ -1,0 +1,4 @@
+# GitHub 업로드 제한(100MB) 초과 방지
+*.zip
+*.mov
+media/*.mov

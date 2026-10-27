@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASHEN THRONE — Graduation Showcase (PDF Deck)</title>
+<link rel="stylesheet" href="v3.css">
+<style>
+  /* ═══════════════════════════════════════════════════════════
+     YY HOMEPAGE EXACT PRINT / PDF OVERRIDES (16:9 WIDESCREEN)
+     Preserves 100% of v3.css styling while laying out slides
+     sequentially for multi-page PDF export.
+  ═══════════════════════════════════════════════════════════ */
+  @page {
+    size: 16in 9in;
+    margin: 0;
+  }
+
+  html {
+    font-size: 15.2px !important;
+    width: 1536px !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: #050608 !important;
+  }
+
+  body {
+    width: 1536px !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: #050608 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .slide {
+    position: relative !important;
+    inset: auto !important;
+    width: 1536px !important;
+    height: 864px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    background: var(--void) !important;
+    --bar: 62px;
+    --pad: 76px;
+  }
+
+  .slide:last-of-type {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+
+  /* Ensure all entrance animations are in their final visible state */
+  .in, .in-x {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    animation: none !important;
+  }
+
+  /* Per-slide letterbox bars (identical to YY fixed bars) */
+  .slide .bar {
+    position: absolute !important;
+    left: 0;
+    right: 0;
+    height: 7.2%;
+    background: #000;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5.2%;
+  }
+  .slide .bar-top { top: 0; border-bottom: 1px solid rgba(201,164,108,.12); }
+  .slide .bar-bot { bottom: 0; border-top: 1px solid rgba(201,164,108,.12); }
+
+  .slide .frame {
+    top: 7.2% !important;
+    bottom: 7.2% !important;
+    padding: 38px 80px !important;
+  }
+
+  .slide .vignette-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 29;
+    pointer-events: none;
+    background: radial-gradient(ellipse 120% 95% at 50% 50%, transparent 58%, rgba(0,0,0,.55) 100%);
+  }
+
+  /* Expand system rows for PDF readability */
+  .sys-row.open-pdf .sys-body {
+    max-height: 16rem !important;
+  }
+  .sys-row.open-pdf .nm {
+    color: var(--gold-hi) !important;
+  }
+
+  /* Arsenal reflection & stage in PDF */
+  .ars-stage .model {
+    max-height: 86% !important;
+  }
+
+  /* Prompt list optimization in PDF */
+  .prm-list {
+    gap: .34rem !important;
+  }
+  .prm-list li {
+    font-size: .68rem !important;
+    line-height: 1.44 !important;
+  }
+  .prm-box {
+    padding: .85rem 1.1rem !important;
+  }
+
+  /* Floating print button for browser preview only */
+  .pdf-toolbar {
+    position: fixed;
+    top: 16px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    gap: 10px;
+  }
+  @media print {
+    .pdf-toolbar { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="pdf-toolbar">
+  <button class="btn sel" onclick="window.print()">🖨️ PDF 저장 / 인쇄</button>
+  <a class="btn" href="index.html" style="text-decoration:none">▶ 인터랙티브 YY 홈페이지 열기</a>
+</div>
+
+<div id="pdfDeck"></div>
+
+<script src="data.js"></script>
+<script>
+(function buildYYPdfDeck() {
+  const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+  const pad = n => String(n).padStart(2, '0');
+  const NAVS = ['TITLE', 'WORLD', 'ARSENAL', 'COMBAT', 'BOSS', 'DEVELOPMENT', 'CREDITS'];
+
+  const TOTAL = 17;
+  let pageNo = 0;
+
+  function chromeBars(navActive, sceneLabel, hideBars) {
+    pageNo++;
+    if (hideBars) return `<div class="vignette-layer"></div>`;
+    const pct = ((pageNo / TOTAL) * 100).toFixed(1);
+    return `
+      <div class="vignette-layer"></div>
+      <header class="bar bar-top">
+        <div class="wordmark">ASHEN <i>THRONE</i></div>
+        <ul class="chapters">
+          ${NAVS.map(n => `<li><button class="${n === navActive ? 'on' : ''}">${n}</button></li>`).join('')}
+        </ul>
+        <div class="bar-meta bar-right">
+          <span class="fs-btn"><span class="fs-ico"></span><span>FULLSCREEN</span></span>
+          <span>SOUND <span class="snd">OFF</span></span>
+        </div>
+      </header>
+      <footer class="bar bar-bot">
+        <div class="bar-meta">${sceneLabel}</div>
+        <div class="deck-nav">
+          <button>&#8592; PREV</button>
+          <div class="progress"><i style="width:${pct}%"></i></div>
+          <span class="deck-count"><b>${pad(pageNo)}</b> / ${pad(TOTAL)}</span>
+          <button>NEXT &#8594;</button>
+        </div>
+        <div class="bar-meta"><button>M · CHAPTERS</button></div>
+      </footer>`;
+  }
+
+  function renderArsenalSlide(catKey, catKo, item, subLabel) {
+    const isWide = !!item.wide;
+    return `
+      <section class="slide active play" id="s-arsenal">
+        <div class="ghost">${item.bg}</div>
+        <div class="frame">
+          <div class="ars">
+            <div class="ars-cats">
+              <button class="${catKey === 'CHARACTER' ? 'on' : ''}">CHARACTER<small>캐릭터</small></button>
+              <button class="${catKey === 'WEAPON' ? 'on' : ''}">WEAPON<small>무기</small></button>
+              <button class="${catKey === 'ENVIRONMENT' ? 'on' : ''}">ENVIRONMENT<small>환경</small></button>
+            </div>
+            <div class="ars-stage">
+              <div class="shaft"></div>
+              <div class="spot"></div>
+              <img class="model ${isWide ? 'shot wide' : ''}" src="${item.img}" alt="${item.name}">
+            </div>
+            <div class="ars-info">
+              <div class="kicker">${catKey}</div>
+              <h2 class="h-l">${item.en}</h2>
+              <div class="ko-title">${item.name} &nbsp; <span class="st ${item.status[0]}">${item.status[1]}</span></div>
+              <p class="lead">${item.lead}</p>
+              <p class="body">${item.desc}</p>
+              <div class="specs">${item.stats.map(s => `<div><span>${s[0]}</span><b>${s[1]}</b></div>`).join('')}</div>
+              <div class="ars-reel">${item.shots.map(s => `<figure><img src="${s[0]}" alt=""></figure>`).join('')}</div>
+            </div>
+          </div>
+        </div>
+        ${chromeBars('ARSENAL', `ARSENAL · 실제 모델링 도감 (${subLabel})`, false)}
+      </section>`;
+  }
+
+  function renderPatternCard(p, totalCount) {
+    const GATE_INFO = {
+      1:  { cls: 'always', badge: '항상 사용 (HP 100%)', label: '항상 사용', hpText: 'HP 100%' },
+      .7: { cls: 'g70', badge: '체력 70% 이하 해금', label: '체력 70% 이하 해금', hpText: 'HP ≤ 70%' },
+      .5: { cls: 'g50', badge: '체력 50% 이하 · 2페이즈', label: '체력 50% 이하 · 2페이즈', hpText: 'HP ≤ 50%' },
+      .3: { cls: 'g30', badge: '체력 30% 이하 · 필살기', label: '체력 30% 이하 · 필살기', hpText: 'HP ≤ 30%' }
+    };
+    const g = GATE_INFO[p.gate] || GATE_INFO[1];
+    return { g, html: `
+      <div class="pc-num-row">
+        <div class="pc-num">${pad(p.n)}<small>/ ${totalCount}</small></div>
+        <span class="pc-gate-badge ${g.cls}"><i class="badge-dot"></i>${g.badge}</span>
+      </div>
+      <h3 class="pc-name">${p.name}${p.sub ? ` <small class="pc-sub">(${p.sub})</small>` : ''}</h3>
+      <div class="pc-en">${p.id.replace(/([a-z])([A-Z])/g, '$1 $2').toUpperCase()}</div>
+      <p class="pc-desc">${p.desc}</p>
+      <div class="timing"><div class="w" style="flex:${p.w}">${p.w}s</div><div class="a" style="flex:${p.a}">${p.a}s</div><div class="r" style="flex:${p.r}">${p.r}s</div></div>
+      <div class="timing-key"><span>전조</span><span>판정</span><span>반격 기회</span></div>
+      <div class="pc-meta"><span class="pc-unlock-meta">해금 조건 <b>${g.badge}</b></span><span>피해 <b>${p.dmg}</b></span><span>사거리 <b>${p.range}</b></span><span>패링 <b>${p.parry ? '가능' : '불가'}</b></span></div>
+      <div class="counter"><span class="label">COUNTER</span>${p.counter}</div>` };
+  }
+
+  const ORDER = [...AT.patterns].sort((a, b) => a.n - b.n);
+  const pat3 = renderPatternCard(ORDER[2], 12);  // 03. 3연격
+  const pat12 = renderPatternCard(ORDER[11], 12); // 12. 필살 잿빛 대파쇄
+  const tAttack = AT.tutorial[2]; // 03. 기본 공격
+  const LB = { done: '완료', wip: '진행 중', plan: '예정' };
+  const cnt = s => AT.ledger.filter(r => r[1] === s).length;
+
+  const html = [
+    /* ═════════ SLIDE 01: TITLE ═════════ */
+    `<section class="slide active play open" id="s-title">
+      <div class="media grade-mid shade-c"><img src="media/hero-city.jpg" alt=""></div>
+      <div class="center" style="padding-bottom:2rem">
+        <div class="kicker c">A DARK FANTASY ACTION GAME</div>
+        <div class="logo" style="margin-top:1.4rem"><div class="glow"></div><span class="main" style="font-size:7.2rem">ASHEN</span><span class="sub" style="font-size:1.6rem">THRONE</span></div>
+        <div class="lore title-tag" style="margin-top:1.4rem">The kingdom has fallen. Enter the ruins. Face what remains.</div>
+        <nav class="menu" id="titleMenu" style="display:flex;margin-top:1.4rem">
+          <button class="mi sel" style="padding:.42rem 3rem"><span>NEW GAME</span></button>
+          <button class="mi" style="padding:.42rem 3rem"><span>PROJECT OVERVIEW</span></button>
+          <button class="mi" style="padding:.42rem 3rem"><span>CONTROLS</span></button>
+          <button class="mi" style="padding:.42rem 3rem"><span>FULLSCREEN</span></button>
+          <button class="mi" style="padding:.42rem 3rem"><span>SOUND &nbsp;<em class="snd">OFF</em></span></button>
+        </nav>
+      </div>
+      <div class="title-foot" style="bottom:82px">INDUK UNIVERSITY &nbsp;·&nbsp; GAME &amp; VR CONTENT DESIGN &nbsp;·&nbsp; GRADUATION PROJECT 2026 &nbsp;·&nbsp; KIM YOUNG-BIN (202136012)</div>
+      ${chromeBars('TITLE', 'TITLE · 게임 타이틀', false)}
+    </section>`,
+
+    /* ═════════ SLIDE 02: WORLD (작품 주제 및 세계관) ═════════ */
+    `<section class="slide active play" id="s-world">
+      <div class="media grade-mid shade-l"><img src="media/hero-city.jpg" alt=""></div>
+      <div class="frame">
+        <div class="world-col">
+          <div class="kicker">CHAPTER I · TOPIC: DARK FANTASY</div>
+          <h2 class="h-xl">The Ashen<br>Kingdom</h2>
+          <p class="lore">The city breathes no more. Yet something ancient still waits upon the throne.</p>
+          <p class="lead">잿빛으로 뒤덮인 왕국. 무너진 성과 폐허 속에서 시작되는 여정. 플레이어는 검을 들고 황폐한 세계를 탐험하며 강력한 보스에게 도전한다.</p>
+          <div class="facts">
+            <div><b>DARK FANTASY</b><span>졸업작품 주제</span></div>
+            <div><b>UNITY 6 · HDRP</b><span>개발 엔진</span></div>
+            <div><b>김영빈</b><span>기획 · 개발 · 아트</span></div>
+            <div><b>2026 —</b><span>제작 기간</span></div>
+          </div>
+        </div>
+        <div class="pillars">
+          ${AT.features.map((f, i) => `<div><i>${ROMAN[i]}</i><b>${f[0]}</b><span>${f[1]}</span></div>`).join('')}
+        </div>
+      </div>
+      ${chromeBars('WORLD', 'THE ASHEN KINGDOM · 작품 주제 및 세계관', false)}
+    </section>`,
+
+    /* ═════════ SLIDE 03: WHY & RESEARCH (선정 이유 및 유사작 조사) ═════════ */
+    `<section class="slide active play" id="s-research">
+      <div class="media grade-dark shade-l"><img src="media/player_castle.jpg" alt=""></div>
+      <div class="frame">
+        <div class="res-grid">
+          <div class="res-left">
+            <div class="kicker">CHAPTER I · MOTIVATION &amp; RESEARCH</div>
+            <h2 class="h-l">Why Dark<br>Fantasy</h2>
+            <p class="lore">Every swing carries weight. Every pattern demands observation.</p>
+            <p class="lead">몰락한 왕국의 폐허와 차가운 석조 회랑, 그리고 잿빛 안개 속에서 펼쳐지는 비장미. 판금 갑옷과 대검의 묵직한 실루엣 속에서 압도적인 보스의 전조를 읽고 파훼하는 다크 판타지 1:1 결투의 긴장감과 극복의 카타르시스를 표현하고자 이 주제를 선정했습니다.</p>
+            <div class="res-why-box">
+              <span class="label">WHY CHOSEN · 다크 판타지 선정 이유 분석</span>
+              <p>다크 판타지 세계관 특유의 깊은 절망감과 비장미, 그리고 거대한 어둠을 자신의 의지와 집중력으로 돌파해냈을 때 얻는 성취감에 매료되었습니다. 화려한 마법보다 묵직한 대검의 관성과 철갑 갑옷의 물성을 온전히 살려내는 정통 다크 판타지 액션을 목표로 삼았습니다.</p>
+            </div>
+          </div>
+          <div class="res-cards">
+            ${AT.research.map(r => `
+              <div class="res-card">
+                <div class="res-card-head"><span class="tag">${r.tag}</span><span class="en">${r.en}</span></div>
+                <h3>${r.ko}</h3>
+                <p>${r.desc}</p>
+                <div class="res-pts">${r.points.map(p => `<div>${p[0]}<b>${p[1]}</b></div>`).join('')}</div>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>
+      ${chromeBars('WORLD', 'WHY & RESEARCH · 다크 판타지 선정 이유 및 유사작 조사', false)}
+    </section>`,
+
+    /* ═════════ SLIDE 04: DIRECTION (게임 방향 · 디테일 · 구현 설정) ═════════ */
+    `<section class="slide active play" id="s-direction">
+      <div class="media grade-dark shade-l"><img src="media/approach_corridor.jpg" alt=""></div>
+      <div class="frame">
+        <div class="dir-head">
+          <div>
+            <div class="kicker">CHAPTER I · GAME DIRECTION</div>
+            <h2 class="h-l">Direction, Detail &amp; Architecture</h2>
+          </div>
+          <p class="lore">Three layers of combat design unified into one seamless boss duel.</p>
+        </div>
+        <div class="dir-cols">
+          ${AT.directions.map(d => `
+            <div class="dir-card">
+              <div class="dir-num">${d.num}</div>
+              <div class="dir-tag">${d.tag}</div>
+              <h3>${d.ko}</h3>
+              <div class="dir-en">${d.en}</div>
+              <p class="dir-lead">${d.lead}</p>
+              <ul class="dir-list">${d.items.map(x => `<li>${x}</li>`).join('')}</ul>
+            </div>`).join('')}
+        </div>
+      </div>
+      ${chromeBars('WORLD', 'GAME DIRECTION · 디렉션 · 디테일 · 구현 설정', false)}
+    </section>`,
+
+    /* ═════════ SLIDE 05: ARSENAL - CHARACTER ═════════ */
+    renderArsenalSlide('CHARACTER', '캐릭터', AT.armory.CHARACTER[0], '철갑 기사'),
+
+    /* ═════════ SLIDE 06: ARSENAL - WEAPON ═════════ */
+    renderArsenalSlide('WEAPON', '무기', AT.armory.WEAPON[0], '그레이트 소드'),
+
+    /* ═════════ SLIDE 07: ARSENAL - ENVIRONMENT ═════════ */
+    renderArsenalSlide('ENVIRONMENT', '환경', AT.armory.ENVIRONMENT[0], '잿빛 회랑'),
+
+    /* ═════════ SLIDE 08: GAME START ═════════ */
+    `<section class="slide active play" id="s-start">
+      <div class="media grade-dark shade-c"><img src="media/cine_fight.jpg" alt="" style="filter:brightness(.38) saturate(.55) blur(1px)"></div>
+      <div class="center">
+        <div class="kicker c" style="margin-bottom:1.4rem">CHAPTER III · INTO THE RUINS</div>
+        <div class="logo"><div class="glow"></div><span class="main">ASHEN</span><span class="sub">THRONE</span></div>
+        <nav class="menu" id="startMenu">
+          <button class="mi sel"><span>START GAME</span></button>
+          <button class="mi"><span>RETURN</span></button>
+        </nav>
+      </div>
+      ${chromeBars('COMBAT', 'GAME START · 게임 실행', false)}
+    </section>`,
+
+    /* ═════════ SLIDE 09: LOADING ═════════ */
+    `<section class="slide active play" id="s-loading">
+      <div class="center">
+        <div class="logo"><div class="glow"></div><span class="main">ASHEN</span><span class="sub">THRONE</span></div>
+        <div class="gauge"><i style="width:74%"></i></div>
+        <div class="gauge-meta"><span>LOADING</span><span>74%</span></div>
+      </div>
+      <div class="tip">
+        <div class="label">TIP</div>
+        <p class="lore">Roll through the strike.</p>
+        <p class="body">구르기 직후 0.44초는 무적이다. 공격 범위를 벗어나라.</p>
+      </div>
+      ${chromeBars('COMBAT', 'LOADING · 인게임 로딩 시스템', false)}
+    </section>`,
+
+    /* ═════════ SLIDE 10: COMBAT TUTORIAL ═════════ */
+    `<section class="slide active play" id="s-tutorial">
+      <div class="media grade-mid shade-l" id="tutMedia">
+        <img src="media/tut_attack.jpg" alt="Tutorial">
+      </div>
+      <div class="frame">
+        <div class="tut">
+          <div class="tut-list">
+            <div class="kicker">CHAPTER III · TUTORIAL</div>
+            <h2 class="h-l">Learn the Blade</h2>
+            <div>
+              ${AT.tutorial.map((t, i) => `
+                <button class="tut-item ${i === 2 ? 'on' : ''}">
+                  <i>${ROMAN[i]}</i><b>${t.ko}</b><span>${t.t}</span>
+                </button>`).join('')}
+            </div>
+            <div class="tut-card">
+              <div class="kicker">III · ${tAttack.t}</div>
+              <h3 class="h-m" style="margin-top:.7rem">${tAttack.ko} &amp; 6단계 인게임 튜토리얼</h3>
+              <div class="keys">${tAttack.keys.map(k => `<span><span class="kbd">${k[0]}</span>${k[1]}</span>`).join('')}<span><span class="kbd">SPACE</span>구르기 (0.44s 무적)</span><span><span class="kbd">Q</span>락온</span></div>
+              <p class="body" style="color:var(--bone)">${tAttack.text} 회랑을 이동하며 보행/질주, 락온, 최대 5타 연계, 지면 밀착 구르기, 스태미나 관리를 순차적으로 학습합니다.</p>
+              <div class="vals">${tAttack.facts.map(f => `<div><b>${f[1]}</b>${f[0]}</div>`).join('')}<div><b>0.44초</b>구르기 무적</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      ${chromeBars('COMBAT', 'TUTORIAL · 인게임 튜토리얼', false)}
+    </section>`,
+
+    /* ═════════ SLIDE 11: CORE SYSTEMS ═════════ */
+    `<section class="slide active play" id="s-system">
+      <div class="media grade-dark shade-l"><img src="media/cine_fight.jpg" alt="" style="filter:brightness(.38) saturate(.6) blur(2px)"></div>
+      <div class="frame">
+        <div class="sys">
+          <div class="sys-head">
+            <div class="kicker">CORE SYSTEMS</div>
+            <h2 class="h-l">Every Swing<br>Has a Cost</h2>
+            <p class="lead">공격 · 회피 · 질주가 모두 스태미나를 쓰는 전투. 실제 게임과 동일한 스태미나 소모 · 회복 · 탈진 규칙으로 작동합니다.</p>
+            <div class="hud-card">
+              <div class="gauge-row"><span>HEALTH</span><div class="g-track"><i class="g-hp" style="width:78%"></i></div><em>156</em></div>
+              <div class="gauge-row"><span>STAMINA</span><div class="g-track"><i class="g-st" style="width:65%"></i><s class="tick"></s></div><em>65</em></div>
+              <div class="hud-state">RECOVERING · 0.8s DELAY → 25/s</div>
+              <div class="hud-btns">
+                <button class="btn sel">ATTACK −15</button>
+                <button class="btn">HEAVY −25</button>
+                <button class="btn">DODGE −25</button>
+                <button class="btn">SPRINT −12</button>
+              </div>
+              <div class="hud-log">
+                <div>구르기 −25 (0.44초 무적 판정)</div>
+                <div>기본 공격 −15 (타격 역경직 0.088s · 슈퍼아머)</div>
+                <div>스태미나 0 도달 시 탈진 → 20 회복 전까지 행동 불가</div>
+              </div>
+            </div>
+          </div>
+          <div class="sys-list">
+            ${AT.systems.map((s, i) => `
+              <div class="sys-row ${i === 1 || i === 3 ? 'on open-pdf' : ''}">
+                <button><span class="nm">${s.name}</span><span class="ix">${ROMAN[i]}</span></button>
+                <div class="sys-body">
+                  <p>${s.text}</p>
+                  <ul>${s.items.map(x => `<li>${x}</li>`).join('')}</ul>
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>
+      ${chromeBars('COMBAT', 'CORE SYSTEMS · 인게임 시스템', false)}
+    </section>`,
+
+    /* ═════════ SLIDE 12: BOSS ENCOUNTER ═════════ */
+    `<section class="slide active play" id="s-encounter">
+      <div class="media shade-blood"><img src="media/boss_arena.jpg" alt="" style="filter:brightness(.52) contrast(1.15) saturate(.55)"></div>
+      <div class="center">
+        <div class="kicker c">CHAPTER IV · BOSS ENCOUNTER</div>
+        <h2 class="boss-name"><small>KNIGHT OF THE</small>ABYSS</h2>
+        <div class="boss-ko">심연의 기사</div>
+        <div class="dialog">
+          <h3>보스전에 도전하시겠습니까?</h3>
+          <p>이곳을 지나면 강력한 적과의 전투가 시작됩니다.</p>
+          <div class="row">
+            <button class="btn ko sel">도전한다</button>
+            <button class="btn ko">돌아간다</button>
+          </div>
+        </div>
+      </div>
+      <div class="enc-foot"><span class="link">&#9654; &nbsp;IN-GAME FOOTAGE · BOSS ENTRANCE UI</span></div>
+      ${chromeBars('BOSS', 'BOSS ENCOUNTER · 보스전 진입', false)}
+    </section>`,
+
+    /* ═════════ SLIDE 13: BOSS PATTERNS (PHASE 1) ═════════ */
+    `<section class="slide active play" id="s-bestiary">
+      <div class="media"><img src="media/cine_fight.jpg" alt="" style="filter:blur(26px) brightness(.22) saturate(.5);transform:scale(1.15)"></div>
+      <div class="frame">
+        <div class="best2">
+          <aside class="pat-panel">
+            <div class="kicker">BOSS PATTERNS · PHASE I (HP 100% ~ 70%)</div>
+            <h2 class="h-l">Knight of<br>the Abyss</h2>
+            <div class="bhp">
+              <div class="meta"><span>${pat3.g.label}</span><span>${pat3.g.hpText}</span></div>
+              <div class="trk"><i style="width:100%"></i><s style="left:70%"></s><s style="left:50%"></s><s style="left:30%"></s></div>
+            </div>
+            <div class="pat-card">${pat3.html}</div>
+            <div class="pat-index">
+              ${ORDER.map((p, k) => {
+                const gi = p.gate === 1 ? 'always' : p.gate === .7 ? 'g70' : p.gate === .5 ? 'g50' : 'g30';
+                return `<button class="${gi} ${k === 2 ? 'on' : k < 2 ? 'seen' : ''}">${pad(p.n)}</button>`;
+              }).join('')}
+            </div>
+          </aside>
+          <div class="stage-video">
+            <img src="media/pat_parry.jpg" alt="Boss Duel">
+            <span class="cn tl"></span><span class="cn tr"></span><span class="cn bl"></span><span class="cn br"></span>
+            <div class="sv-cap"><span class="rec"></span>IN-GAME · BOSS DUEL (12 PATTERNS FSM)</div>
+          </div>
+        </div>
+      </div>
+      ${chromeBars('BOSS', 'BOSS PATTERNS · 보스 패턴 도감 (전조 · 판정 · 후딜)', false)}
+    </section>`,
+
+    /* ═════════ SLIDE 14: BOSS PATTERNS (PHASE 2 & ULTIMATE) ═════════ */
+    `<section class="slide active play" id="s-bestiary">
+      <div class="media"><img src="media/cine_fight.jpg" alt="" style="filter:blur(26px) brightness(.22) saturate(.5);transform:scale(1.15)"></div>
+      <div class="frame">
+        <div class="best2">
+          <aside class="pat-panel">
+            <div class="kicker">BOSS PATTERNS · PHASE II &amp; ULTIMATE (HP ≤ 50% / 30%)</div>
+            <h2 class="h-l">Phase Shift &amp;<br>Ashen Ruin</h2>
+            <div class="bhp">
+              <div class="meta"><span>${pat12.g.label}</span><span>${pat12.g.hpText}</span></div>
+              <div class="trk"><i style="width:30%"></i><s style="left:70%"></s><s style="left:50%"></s><s style="left:30%"></s></div>
+            </div>
+            <div class="pat-card">${pat12.html}</div>
+            <div class="pat-index">
+              ${ORDER.map((p, k) => {
+                const gi = p.gate === 1 ? 'always' : p.gate === .7 ? 'g70' : p.gate === .5 ? 'g50' : 'g30';
+                return `<button class="${gi} ${k === 11 ? 'on' : 'seen'}">${pad(p.n)}</button>`;
+              }).join('')}
+            </div>
+          </aside>
+          <div class="stage-video">
+            <img src="media/boss_fight.jpg" alt="Boss Ultimate">
+            <span class="cn tl"></span><span class="cn tr"></span><span class="cn bl"></span><span class="cn br"></span>
+            <div class="sv-cap"><span class="rec"></span>IN-GAME · PHASE II RAGE COMBO &amp; ASHEN RUIN</div>
+          </div>
+        </div>
+      </div>
+      ${chromeBars('BOSS', 'BOSS PATTERNS · 2페이즈 난무 및 필살기', false)}
+    </section>`,
+
+    /* ═════════ SLIDE 15: AI PROMPT & PROTOTYPE VIDEO (사용 프롬프트 & 졸작영상) ═════════ */
+    `<section class="slide active play" id="s-prompt">
+      <div class="media grade-dark shade-l"><img src="media/boss_arena.jpg" alt="" style="filter:brightness(.28) saturate(.6)"></div>
+      <div class="frame">
+        <div class="prm-grid">
+          <div class="prm-left">
+            <div class="kicker">CHAPTER V · ANTIGRAVITY WORKFLOW</div>
+            <h2 class="h-l">Prompt Codex &amp; Prototype</h2>
+            <div class="prm-box">
+              <span class="label">ANTIGRAVITY PROMPT CODEX · 사용한 7대 프롬프트</span>
+              <ol class="prm-list">
+                ${AT.prompts.map((txt, i) => `<li><i>${pad(i + 1)}</i><span>${txt}</span></li>`).join('')}
+              </ol>
+            </div>
+          </div>
+          <div class="prm-right">
+            <div class="stage-video">
+              <img src="media/boss_full.jpg" alt="Graduation Video Preview">
+              <span class="cn tl"></span><span class="cn tr"></span><span class="cn bl"></span><span class="cn br"></span>
+              <div class="sv-cap"><span class="rec"></span>GRADUATION SHOWCASE FOOTAGE · 졸작영상.mov</div>
+            </div>
+            <div class="prm-meta-card" style="margin-top:1.2rem">
+              <div>
+                <span class="label">PROTOTYPE RECORDING &amp; YOUTUBE</span>
+                <b>졸업작품 프로토타입 실행 영상 (바탕 화면 / 졸작영상.mov)</b>
+                <span>안티그래비티 피드백 루프 검증 · 화면 캡처 및 플레이 영상 유튜브 첨부</span>
+              </div>
+              <a class="btn sel" href="media/졸작영상.mov" style="text-decoration:none">&#9654; PLAY VIDEO</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      ${chromeBars('DEVELOPMENT', 'AI & PROTOTYPE · 사용 프롬프트 및 시연영상', false)}
+    </section>`,
+
+    /* ═════════ SLIDE 16: DEVELOPMENT ═════════ */
+    `<section class="slide active play" id="s-dev">
+      <div class="media grade-dark shade-l"><img src="media/cine_fight.jpg" alt="" style="filter:brightness(.25) saturate(.5) blur(3px)"></div>
+      <div class="frame">
+        <div class="dev-head">
+          <div>
+            <div class="kicker">CHAPTER V · DEVELOPMENT</div>
+            <h2 class="h-l">The Road So Far</h2>
+          </div>
+          <div class="tally">
+            <div><b>${cnt('done')}</b><span>COMPLETE</span></div>
+            <div><b>${cnt('wip')}</b><span>IN PROGRESS</span></div>
+            <div><b>${cnt('plan')}</b><span>PLANNED</span></div>
+          </div>
+        </div>
+        <div class="dev">
+          <div class="ledger">
+            ${AT.ledger.map(r => `<div><b>${r[0]}</b><span class="st ${r[1]}">${LB[r[1]]}</span><p>${r[2]}</p></div>`).join('')}
+          </div>
+          <ol class="road">
+            <span class="label">NEXT STEPS</span>
+            ${AT.roadmap.map(r => `<li><b>${r[0]}</b><span>${r[1]}</span></li>`).join('')}
+          </ol>
+        </div>
+      </div>
+      ${chromeBars('DEVELOPMENT', 'DEVELOPMENT · 제작 성과 및 계획', false)}
+    </section>`,
+
+    /* ═════════ SLIDE 17: ENDING (CREDITS) ═════════ */
+    `<section class="slide active play" id="s-ending">
+      <div class="media grade-dark shade-c"><img src="media/cine_victory.jpg" alt=""></div>
+      <div class="center">
+        <div class="kicker c">THANK YOU FOR PLAYING</div>
+        <div class="logo" style="margin-top:2rem"><div class="glow"></div><span class="main">ASHEN</span><span class="sub">THRONE</span></div>
+        <p class="lead closing">ASHEN THRONE은 다크 판타지 세계관을 기반으로 캐릭터와 환경을 제작하고, 이를 Unity에서 플레이 가능한 게임 경험으로 구현하는 졸업작품입니다. 앞으로 전투의 완성도와 보스전의 몰입감을 높여 하나의 완성된 게임 경험으로 발전시키겠습니다.</p>
+        <div class="credit-row">
+          <div><span class="label">INSTITUTION</span><b>INDUK UNIVERSITY</b></div>
+          <div><span class="label">DEPARTMENT</span><b>GAME &amp; VR CONTENT DESIGN</b></div>
+          <div><span class="label">DEVELOPER</span><b>김영빈 · KIM YOUNG-BIN (202136012)</b></div>
+        </div>
+        <nav class="menu" id="endMenu">
+          <button class="mi sel"><span>REPLAY</span></button>
+          <button class="mi"><span>BACK TO TITLE</span></button>
+        </nav>
+      </div>
+      ${chromeBars('CREDITS', 'CREDITS · 마무리', false)}
+    </section>`
+  ].join('\n');
+
+  document.getElementById('pdfDeck').innerHTML = html;
+})();
+</script>
+</body>
+</html>
